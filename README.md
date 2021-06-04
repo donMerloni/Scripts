@@ -6,7 +6,7 @@ Various helper scripts and stuff
     - [webp2gif.bat](#webp2gifbat)
     - [webp2gifski.bat](#webp2gifskibat)
     - [webp2mp4.bat](#webp2mp4bat)
-  - [Zip and upload/move folder](#zip-and-uploadmove-folder)
+  - [Zip and upload/move directory](#zip-and-uploadmove-directory)
     - [DeployMEGA.bat](#deploymegabat)
 
 ## WebP conversion
@@ -32,16 +32,16 @@ Creates a converted MP4 next to input file. Very compact and good quality but ap
 [ffmpeg](https://www.ffmpeg.org/) and
 [libwebp](https://developers.google.com/speed/webp/download) (anim_dump, webpinfo)
 
-## Zip and upload/move folder
+## Zip and upload/move directory
 
 ### DeployMEGA.bat
-Zips a folder, uploads archive to MEGA and moves it somewhere.
+Zips a directory, uploads archive to MEGA and moves it somewhere.
 
 **Requires:**
-[MegaCMD](https://mega.nz/cmd),
+[MEGAcmd](https://mega.nz/cmd),
 [7z](https://7-zip.org/) and
 [7z LZMA SDK](https://7-zip.org/sdk.html) (7z.sfx)\
 **Usage:**
-```DeployMEGA <folder> <zip name> <MEGA path> <local path>```\
+```DeployMEGA <directory> <zip name> <MEGA path> <local path>```\
 **Usage:**
-```DeployMEGA "C:\MyProject\bin\Release" MyProject-Release "/Cool Projects" D:\Packages```
+```DeployMEGA "C:\MyProject\bin\Release" MyProject-Release "/Uploaded Packages" "D:\Local Packages"```
