@@ -2,9 +2,12 @@
 Various helper scripts and stuff. Pretty much Windows only.
 
 - [Scripts](#scripts)
-  - [Programming related tools](#programming-related-tools)
-    - [checkdef.cs](#checkdefcs)
+  - [General stuff](#general-stuff)
+    - [echoo.cs](#echoocs)
       - [Compiling](#compiling)
+  - [Programming related stuff](#programming-related-stuff)
+    - [checkdef.cs](#checkdefcs)
+      - [Compiling](#compiling-1)
   - [WebP conversion](#webp-conversion)
     - [webp2gif.bat](#webp2gifbat)
     - [webp2gifski.bat](#webp2gifskibat)
@@ -12,7 +15,19 @@ Various helper scripts and stuff. Pretty much Windows only.
   - [Zip and upload/move directory](#zip-and-uploadmove-directory)
     - [deploy_MEGA.bat](#deploy_megabat)
 
-## Programming related tools
+## General stuff
+
+### echoo.cs
+
+Merely echoes all passed arguments and standard input. For debugging/troubleshooting.\
+Use it by piping program output into it, like so: `dir | echoo`
+
+#### Compiling 
+**requires** a C# 7.0 compiler (csc)
+
+`csc echoo.cs -optimize+`
+
+## Programming related stuff
 
 ### checkdef.cs
 **requires** Microsoft's C/C++ compiler (cl)
