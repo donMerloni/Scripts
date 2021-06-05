@@ -176,7 +176,7 @@ class App
             var me = Process.GetCurrentProcess().ProcessName;
 
 #if true
-            Console.WriteLine($@"Returns the value of any preprocessor define
+            Console.WriteLine($@"Lookup the value of preprocessor defines.
 note: Microsoft C/C++ Compiler (cl.exe) must be in environment PATH
 usage: {me} [options] <DEFINE>...
 where:
@@ -193,7 +193,7 @@ options:
     -T <milliseconds>         Timeout in milliseconds for the preprocessor (Example: -T 1000)
     -V                        Show verbose/debug messages");
 #else
-            Console.WriteLine("Returns the value of any preprocessor define");
+            Console.WriteLine("Lookup the value of preprocessor defines.");
             Console.WriteLine("note: Microsoft C/C++ Compiler (cl.exe) must be in environment PATH");
             Console.WriteLine($"usage: {me} [options] <DEFINE>...");
             Console.WriteLine("where:");

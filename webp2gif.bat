@@ -47,7 +47,7 @@ setlocal DisableDelayedExpansion
 set "filePath=%~f1"
 set "fileName=%~n1"
 set "tempDir=%~dp0%fileName%"
-set "prefix=%fileName: =_%_"
+set "prefix=%fileName: =_%__"
 path %~dp0;%path%
 setlocal EnableDelayedExpansion
 
@@ -74,19 +74,20 @@ pushd !tempDir!
         echo duration 10000 >>"!prefix!concat.txt"
     )
 
-    call :make_gif "!fileName!" diff bayer 5 rectangle 0
+    call :make_gif "!fileName!" 0 diff bayer 5 rectangle 0
     
-    :: the code below generates a gif for each possible combination of ffmpeg settings.
-    REM for %%S in (full diff single) do (
-        REM for %%D in (bayer heckbert floyd_steinberg sierra2 sierra2_4a) do (
-            REM for /L %%B in (0,1,5) do (
-                REM call :make_gif "" %%S %%D %%B none 0
-                REM call :make_gif "" %%S %%D %%B none 1
-                REM call :make_gif "" %%S %%D %%B rectangle 0
-                REM call :make_gif "" %%S %%D %%B rectangle 1
-            REM )
-        REM )
-    REM )
+    :: the code below generates a gif for each combination of ffmpeg settings (at the moment 120 combinations)
+    :: the files will not be moved out of the temp folder though
+    @REM for %%S in (full diff single) do (
+    @REM     for %%D in (bayer heckbert floyd_steinberg sierra2 sierra2_4a) do (
+    @REM         for /L %%B in (0,1,5) do (
+    @REM             call :make_gif "!fileName!" 1 %%S %%D %%B none 0
+    @REM             call :make_gif "!fileName!" 1 %%S %%D %%B none 1
+    @REM             call :make_gif "!fileName!" 1 %%S %%D %%B rectangle 0
+    @REM             call :make_gif "!fileName!" 1 %%S %%D %%B rectangle 1
+    @REM         )
+    @REM     )
+    @REM )
     
     del "!prefix!*"
 popd
@@ -96,20 +97,21 @@ if %rd% equ 1 rd "!tempDir!"
 exit /b
 
 ::
-:: Small helper that passes stuff to ffmpeg correctly and adjusts the output filename.
+:: Small helper that passes stuff to ffmpeg correctly.
+:: If %2 (autoname) is 1, the output filename will be adjusted according to the settings.
 ::
-:make_gif filename stats_mode dither bayer_scale diff_mode new
+:make_gif filename autoname stats_mode dither bayer_scale diff_mode new
 setlocal EnableDelayedExpansion
 
-if not "%~1"=="" (set "filename=%~1.gif") else (
-    if %3==bayer (set "filename=%~1_%2-%3%4-%5") else (
-        if %4 gtr 0 exit /b
-        set "filename=%~1_%2-%3-%5"
+if %2 equ 0 (set "filename=%~1") else (
+    if %4==bayer (set "filename=%~1_%3-%4%5-%6") else (
+        if %5 gtr 0 exit /b
+        set "filename=%~1_%3-%4-%6"
     )
-    if %6 equ 1 set "filename=%filename%-new"
-    set "filename=%filename:-none=%.gif"
+    if %7 equ 1 set "filename=!filename!-new"
+    set "filename=!filename:-none=!"
 )
-ffmpeg -f concat -i "!prefix!concat.txt" -vf "split[i0][i1],[i0]palettegen=stats_mode=%2[p],[i1][p]paletteuse=%3:%4:%5:%6" "%filename%"
+ffmpeg -f concat -i "!prefix!concat.txt" -vf "split[i0][i1],[i0]palettegen=stats_mode=%3[p],[i1][p]paletteuse=%4:%5:%6:%7" "!filename!.gif"
 
 endlocal & exit /b
 
