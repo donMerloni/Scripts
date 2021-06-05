@@ -175,7 +175,6 @@ class App
         {
             var me = Process.GetCurrentProcess().ProcessName;
 
-#if true
             Console.WriteLine($@"Lookup the value of preprocessor defines.
 note: Microsoft C/C++ Compiler (cl.exe) must be in environment PATH
 usage: {me} [options] <DEFINE>...
@@ -183,34 +182,15 @@ where:
     DEFINE                    A preprocessor define name (Example: _WIN32)
 options:
     -C                        Collapse multi-line macros into a single line
-    -D <name>{{=|#}}<text>    #define <name> <text> (Example: -D N=42)
+    -D <name>{{=|#}}<text>      #define <name> <text> (Example: -D N=42)
     -F <flags>                Additional compiler flags to use (Example: -F \""/D_DEBUG /Zi\"")
     -I <header>               #include <header> (Example: -I Windows.h)
     -L <commandfile>          File containing a whitespace separated list of command line arguments to use
                               (Example: -L commands.txt)
-    -R {{all|any}}            Criteria for when to return 0 (success code). Defaults to ""all"", which
+    -R {{all|any}}              Criteria for when to return 0 (success code). Defaults to ""all"", which
                               means every define name must be defined
     -T <milliseconds>         Timeout in milliseconds for the preprocessor (Example: -T 1000)
     -V                        Show verbose/debug messages");
-#else
-            Console.WriteLine("Lookup the value of preprocessor defines.");
-            Console.WriteLine("note: Microsoft C/C++ Compiler (cl.exe) must be in environment PATH");
-            Console.WriteLine($"usage: {me} [options] <DEFINE>...");
-            Console.WriteLine("where:");
-            Console.WriteLine("    DEFINE                  A preprocessor define name (Example: _WIN32)");
-            Console.WriteLine("options:");
-            //Console.WriteLine("    -X <batchscript>        Executes a batch script");
-            Console.WriteLine("    -C                      Collapse multi-line macros into a single line");
-            Console.WriteLine("    -D <name>{=|#}<text>    #define <name> <text> (Example: -D N=42)");
-            Console.WriteLine("    -F <flags>              Additional compiler flags to use (Example: -F \"/D_DEBUG /Zi\")");
-            Console.WriteLine("    -I <header>             #include <header> (Example: -I Windows.h)");
-            Console.WriteLine("    -L <commandfile>        File containing a whitespace separated list of command line arguments to use");
-            Console.WriteLine("                            (Example: -L commands.txt)");
-            Console.WriteLine("    -R {all|any}            Criteria for when to return 0 (success code). Defaults to \"all\", which");
-            Console.WriteLine("                            means every define name must be defined");
-            Console.WriteLine("    -T <milliseconds>       Timeout in milliseconds for the preprocessor (Example: -T 1000)");
-            Console.WriteLine("    -V                      Show verbose/debug messages");
-#endif
 
             return (int)ExitCode.Help;
         }
