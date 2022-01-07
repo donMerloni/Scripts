@@ -96,6 +96,18 @@ function Parse-Vdf {
     } -Force -PassThru
 }
 
+function Git-Sha($filepath) {
+    $content = get-content $filepath -Encoding Byte
+    $size = $content.Length
+    $content = [Text.Encoding]::UTF8.GetString($content)
+
+    $str = "blob $size`0$content"
+    $bytes = [Text.Encoding]::UTF8.GetBytes($str)
+    $stream = [IO.MemoryStream]::new($bytes)
+
+    (get-filehash -InputStream $stream -Algorithm SHA1).Hash.ToLower()
+}
+
 function Login($username) {
     $process = (ps Steam -ErrorAction SilentlyContinue)
     
@@ -123,23 +135,27 @@ try {
     # (Exit 0) Update script to latest version
     #
     if ($Update) {
-        $latestDate = get-date ((iwr "https://api.github.com/repos/lakatosm/scripts/commits?path=login_steam.ps1&page=1&per_page=1") | ConvertFrom-Json)[0].commit.committer.date
-        $localDate = (gi $PSCommandPath).LastWriteTime
+        $noCache = @{Headers = @{"Cache-Control" = "no-cache" } }
+        $localSha = Git-Sha $PSCommandPath
 
-        if ($localDate -gt $latestDate) {
-            if (0 -ne $Host.UI.PromptForChoice("Update", "The script appears to be newer than the latest version on GitHub. If you made changes, you will lose them! Update anyway?", ("&yes", "&no"), 1)) {
+        $blob = try { iwr "https://api.github.com/repos/lakatosm/Scripts/git/blobs/$localSha" @noCache } catch { $_.Exception.Response }
+        if ($blob.StatusCode -eq 404) {
+            if (0 -ne $Host.UI.PromptForChoice("Update", "It seems like the script was modified. All changes made will be overwritten! Update anyway?", ("&yes", "&no"), 1)) {
                 exit 0
             }
         }
+        else {
+            $tree = (irm "https://api.github.com/repos/lakatosm/Scripts/git/trees/master" @noCache).tree
+            $sha = ($tree | ? path -eq "login_steam.ps1").sha
 
-        if ($localDate -eq $latestDate) { write "Already up to date"; exit 0 }
+            if ($sha -eq $localSha) { write "Already up to date"; exit 0 }
+        }
 
         write "Downloading latest version from GitHub"
-        $latest = (iwr "https://raw.githubusercontent.com/lakatosm/Scripts/master/login_steam.ps1" -Headers @{"Cache-Control" = "no-cache" }).Content
+        $latest = (iwr "https://raw.githubusercontent.com/lakatosm/Scripts/master/login_steam.ps1" @noCache).Content
 
         write "Replacing self"
         [IO.File]::WriteAllText($PSCommandPath, $latest)
-        sp $PSCommandPath LastWriteTime $latestDate
 
         write "Update successful"
         exit 0
