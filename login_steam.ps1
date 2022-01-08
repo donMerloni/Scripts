@@ -26,17 +26,17 @@ function DateTo-TimeAgo($date) {
     
     $a = @()
     if ($y -ge 1) {
-        $a += N $y "year"
-        $a += N $d "day"
+        $a += N $y 'year'
+        $a += N $d 'day'
     }
     elseif ($d -ge 1) {
-        $a += N $d "day"
+        $a += N $d 'day'
     }
     else {
-        $a += N $h "hr"
-        $a += N $m "min"
+        $a += N $h 'hr'
+        $a += N $m 'min'
     }
-    if ($a) { "$($a -join ", ") ago" } else { "now" }
+    if ($a) { "$($a -join ', ') ago" } else { 'now' }
 }
 
 function Get-Crc32($bytes) {
@@ -60,10 +60,10 @@ function Parse-Vdf {
     [System.Collections.Stack] $stack = @([ordered]@{})
     $level = 0
     $m.matches | % {
-        $k = $_.groups["key"].value;
-        $v = $_.groups["value"]
+        $k = $_.groups['key'].value;
+        $v = $_.groups['value']
         $cur = $stack.Peek()
-        if ($_ -like "*}") {
+        if ($_ -like '*}') {
             $null = $stack.Pop()
             $level--
         }
@@ -113,7 +113,7 @@ function Login($username) {
     
     if ($username) {
         if ($Users[$username].SteamID64 -eq $ActiveUser -and $process) {
-            write "Already logged in"
+            write 'Already logged in'
             Add-Type 'public class Native { [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern void ShowWindow(System.IntPtr hWnd, int nCmdShow); }'
             [Native]::ShowWindow($process.MainWindowHandle, 1)
             return
@@ -122,7 +122,7 @@ function Login($username) {
         if ($Users[$username].Cached) { write "Hello $($Users[$username].PersonaName)" }
         else { write "Please log in for $username" }
     }
-    else { write "Please log in" }
+    else { write 'Please log in' }
 
     if ($process) { $process.Kill() }
     sp registry::HKCU\SOFTWARE\Valve\Steam AutoLoginUser $username
@@ -135,29 +135,29 @@ try {
     # (Exit 0) Update script to latest version
     #
     if ($Update) {
-        $noCache = @{Headers = @{"Cache-Control" = "no-cache" } }
+        $noCache = @{Headers = @{'Cache-Control' = 'no-cache' } }
         $localSha = Git-Sha $PSCommandPath
 
         $blob = try { iwr "https://api.github.com/repos/lakatosm/Scripts/git/blobs/$localSha" @noCache } catch { $_.Exception.Response }
         if ($blob.StatusCode -eq 404) {
-            if (0 -ne $Host.UI.PromptForChoice("Update", "It seems like the script was modified. All changes made will be overwritten! Update anyway?", ("&yes", "&no"), 1)) {
+            if (0 -ne $Host.UI.PromptForChoice('Update', 'It seems like the script was modified. All changes made will be overwritten! Update anyway?', ('&yes', '&no'), 1)) {
                 exit 0
             }
         }
         else {
-            $tree = (irm "https://api.github.com/repos/lakatosm/Scripts/git/trees/master" @noCache).tree
-            $sha = ($tree | ? path -eq "login_steam.ps1").sha
+            $tree = (irm 'https://api.github.com/repos/lakatosm/Scripts/git/trees/master' @noCache).tree
+            $sha = ($tree | ? path -eq 'login_steam.ps1').sha
 
-            if ($sha -eq $localSha) { write "Already up to date"; exit 0 }
+            if ($sha -eq $localSha) { write 'Already up to date'; exit 0 }
         }
 
-        write "Downloading latest version from GitHub"
-        $latest = (iwr "https://raw.githubusercontent.com/lakatosm/Scripts/master/login_steam.ps1" @noCache).Content
+        write 'Downloading latest version from GitHub'
+        $latest = (iwr 'https://raw.githubusercontent.com/lakatosm/Scripts/master/login_steam.ps1' @noCache).Content
 
-        write "Replacing self"
+        write 'Replacing self'
         [IO.File]::WriteAllText($PSCommandPath, $latest)
 
-        write "Update successful"
+        write 'Update successful'
         exit 0
     }
 
@@ -168,17 +168,17 @@ try {
     #
     if ($Install) {
         $shell = new-object -ComObject WScript.Shell
-        $sh = $shell.CreateShortcut((Join-Path $shell.SpecialFolders["Desktop"] "Steam Account Manager.lnk"))
+        $sh = $shell.CreateShortcut((Join-Path $shell.SpecialFolders['Desktop'] 'Steam Account Manager.lnk'))
 
         if (Test-Path $sh.FullName) {
-            if (0 -ne $Host.UI.PromptForChoice($sh.FullName, "The shortcut exists already. Overwrite it?", ("&yes", "&no"), 1)) {
+            if (0 -ne $Host.UI.PromptForChoice($sh.FullName, 'The shortcut exists already. Overwrite it?', ('&yes', '&no'), 1)) {
                 exit 0
             }
         }
 
-        $sh.TargetPath = "powershell.exe"
+        $sh.TargetPath = 'powershell.exe'
         $sh.WorkingDirectory = $PSScriptRoot
-        $sh.Description = "Steam Account Manager"
+        $sh.Description = 'Steam Account Manager'
         $sh.Arguments = "-WindowStyle Hidden -File `"$($PSCommandPath)`" -Gui"
         $sh.IconLocation = "$(Join-Path $Steam steam.exe),1"
         $sh.WindowStyle = 7
@@ -191,12 +191,12 @@ try {
     # get the user list
     $Users = @{}
     $ActiveUser = ((gp registry::HKEY_CURRENT_USER\SOFTWARE\Valve\Steam\ActiveProcess).ActiveUser + 0x110000100000000).ToString()
-    $ConnectCache = (cat (Join-Path $Steam config/config.vdf) -raw | Parse-Vdf)["InstallConfigStore"]["Software"]["Valve"]["steam"]["ConnectCache"]
+    $ConnectCache = (cat (Join-Path $Steam config/config.vdf) -raw | Parse-Vdf)['InstallConfigStore']['Software']['Valve']['steam']['ConnectCache']
     $LoginUsers = cat (Join-Path $Steam config/loginusers.vdf) -raw | Parse-Vdf
-    $LoginUsers["users"].keys | % {
-        $user = $LoginUsers["users"][$_]
+    $LoginUsers['users'].keys | % {
+        $user = $LoginUsers['users'][$_]
         $user.SteamID64 = $_
-        $user.Cached = $ConnectCache[(Get-Crc32 $user.AccountName).ToString('x') + "1"].Length -gt 16
+        $user.Cached = $ConnectCache[(Get-Crc32 $user.AccountName).ToString('x') + '1'].Length -gt 16
         $user.Timestamp /= 1 # Convert to number
         $user.LastLogin = DateTo-TimeAgo (DateFrom-UnixSeconds $user.Timestamp)
         if ($ActiveUser -eq $_) { $user.Comment = "(logged in) $($user.Comment)" }
@@ -210,11 +210,11 @@ try {
     
     # build UI view
     $view = @(
-        @{N = "Cached"; E = { if ($_.Cached) { return "✓" } } }
-        @{N = "Account name"; E = { $_.AccountName } }
-        @{N = "Profile name"; E = { $_.PersonaName } }
-        @{N = "Last login"; E = { $_.LastLogin } }
-        @{N = "Comment"; E = { $_.Comment } }
+        @{N = 'Cached'; E = { if ($_.Cached) { return '✓' } } }
+        @{N = 'Account name'; E = { $_.AccountName } }
+        @{N = 'Profile name'; E = { $_.PersonaName } }
+        @{N = 'Last login'; E = { $_.LastLogin } }
+        @{N = 'Comment'; E = { $_.Comment } }
     )
     $usersView = $Users.values | sort Timestamp -Descending | select $view
 
@@ -226,14 +226,14 @@ try {
     #
     # (Exit 4) GUI view and login
     #
-    $add = "(+) Add"
+    $add = '(+) Add'
     $usersView += $add | % { [PSCustomObject]@{$view[0].N = $_ } }
 
-    $choice = $usersView | Out-GridView -Title "Log into account" -OutputMode Single
+    $choice = $usersView | Out-GridView -Title 'Log into account' -OutputMode Single
     if (!$choice) { exit 0 }
 
     switch ($choice.'Account name') {
-        $add { Login "" }
+        $add { Login '' }
         default { Login $choice.'Account name' }
     }
 }
