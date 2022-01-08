@@ -169,7 +169,6 @@ try {
     if ($Install) {
         $shell = new-object -ComObject WScript.Shell
         $sh = $shell.CreateShortcut((Join-Path $shell.SpecialFolders["Desktop"] "Steam Account Manager.lnk"))
-        $sh.TargetPath = "powershell.exe"
 
         if (Test-Path $sh.FullName) {
             if (0 -ne $Host.UI.PromptForChoice($sh.FullName, "The shortcut exists already. Overwrite it?", ("&yes", "&no"), 1)) {
@@ -177,10 +176,11 @@ try {
             }
         }
 
+        $sh.TargetPath = "powershell.exe"
         $sh.WorkingDirectory = $PSScriptRoot
         $sh.Description = "Steam Account Manager"
-        $sh.Arguments = "-WindowStyle Hidden $($PSCommandPath) -gui"
-        $sh.IconLocation = "$(Join-Path $Steam steam.exe), 1"
+        $sh.Arguments = "-WindowStyle Hidden -File `"$($PSCommandPath)`" -Gui"
+        $sh.IconLocation = "$(Join-Path $Steam steam.exe),1"
         $sh.WindowStyle = 7
         $sh.Save()
 
