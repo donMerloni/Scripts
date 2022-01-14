@@ -13,7 +13,7 @@ param(
     [Parameter()][switch]$Update
 )
 
-function DateFrom-UnixSeconds ($seconds) { [DateTimeOffset]::FromUnixTimeSeconds($seconds).ToLocalTime().DateTime }
+function DateFrom-UnixSeconds ($seconds) { (get-date 1-1-1970).AddSeconds($seconds).ToLocalTime() }
 
 function DateTo-TimeAgo($date) {
     function N($n, $s) { if ($n -eq 1) { return "$n $s" } elseif ($n -gt 1) { return "$n $s`s" } }
