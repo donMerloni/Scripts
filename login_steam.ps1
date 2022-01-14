@@ -40,7 +40,7 @@ function DateTo-TimeAgo($date) {
 }
 
 function Get-Crc32($bytes) {
-    if ($bytes -is [string]) { $bytes = [System.Text.Encoding]::ASCII.GetBytes($bytes) }
+    if ($bytes -is [string]) { $bytes = [System.Text.Encoding]::UTF8.GetBytes($bytes) }
 
     $crc = [uint32]'0xFFFFFFFF' # Microsoft strikes again
     foreach ($b in $bytes) {
