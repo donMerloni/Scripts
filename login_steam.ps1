@@ -17,13 +17,13 @@ function DateFrom-UnixSeconds ($seconds) { (get-date 1-1-1970).AddSeconds($secon
 
 function DateTo-TimeAgo($date) {
     function N($n, $s) { if ($n -eq 1) { return "$n $s" } elseif ($n -gt 1) { return "$n $s`s" } }
-    
+
     $diff = new-timespan $date (get-date)
     $y = [Math]::Floor($diff.days / 365)
     $d = $diff.days - $y * 365
     $h = $diff.hours
     $m = $diff.minutes
-    
+
     $a = @()
     if ($y -ge 1) {
         $a += N $y 'year'
@@ -88,7 +88,7 @@ function Parse-Vdf {
                     entry $v ($depth + 1)
                     write "$(tab $depth)}"
                 }
-            }   
+            }
         }
 
         entry $this 0
@@ -110,7 +110,7 @@ function Git-Sha($filepath) {
 
 function Login($username) {
     $process = (ps Steam -ErrorAction SilentlyContinue)
-    
+
     if ($username) {
         if ($Users[$username].SteamID64 -eq $ActiveUser -and $process) {
             write 'Already logged in'
@@ -187,7 +187,7 @@ try {
         write "Shortcut created: $($sh.FullName)"
         exit 0
     }
-    
+
     # get the user list
     $Users = @{}
     $ActiveUser = ((gp registry::HKEY_CURRENT_USER\SOFTWARE\Valve\Steam\ActiveProcess).ActiveUser + 0x110000100000000).ToString()
@@ -207,7 +207,7 @@ try {
     # (Exit 2) Command line login
     #
     if ($Username) { Login $Username; exit 0 }
-    
+
     # build UI view
     $view = @(
         @{N = 'Cached'; E = { if ($_.Cached) { return '✓' } } }
