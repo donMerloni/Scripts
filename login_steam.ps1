@@ -161,7 +161,7 @@ try {
         exit 0
     }
 
-    $Steam = (gp registry::HKCU\SOFTWARE\Valve\Steam).SteamPath
+    $Steam = (gp registry::HKCU\SOFTWARE\Valve\Steam SteamPath).SteamPath
 
     #
     # (Exit 1) Create desktop shortcut for GUI mode
@@ -190,7 +190,7 @@ try {
 
     # get the user list
     $Users = @{}
-    $ActiveUser = ((gp registry::HKEY_CURRENT_USER\SOFTWARE\Valve\Steam\ActiveProcess).ActiveUser + 0x110000100000000).ToString()
+    $ActiveUser = ((gp registry::HKEY_CURRENT_USER\SOFTWARE\Valve\Steam\ActiveProcess ActiveUser).ActiveUser + 0x110000100000000).ToString()
     $ConnectCache = (cat (Join-Path $Steam config/config.vdf) -raw | Parse-Vdf)['InstallConfigStore']['Software']['Valve']['steam']['ConnectCache']
     $LoginUsers = cat (Join-Path $Steam config/loginusers.vdf) -raw | Parse-Vdf
     $LoginUsers['users'].keys | % {
