@@ -45,7 +45,7 @@ function Get-Crc32($bytes) {
     $crc = [uint32]'0xFFFFFFFF' # Microsoft strikes again
     foreach ($b in $bytes) {
         $crc = $crc -bxor $b
-        1..8 | % {
+        for ($i = 0; $i -lt 8; $i++) {
             $mask = -bnot (($crc -band 1) - 1)
             $crc = ($crc -shr 1) -bxor (0xEDB88320 -band $mask)
         }
