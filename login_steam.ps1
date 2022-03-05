@@ -56,7 +56,7 @@ function Get-Crc32($bytes) {
 function Parse-Vdf {
     function tab($depth) { if ($depth -gt 0) { [string]::new(9, $depth) } }
 
-    $m = $Input | sls "`"(?<key>.+?)`"(?:\s{1,}`"(?<value>(.|`n)*?)`")?|}" -AllMatches
+    $m = $Input | sls "`"(?<key>.+?)`"(?:\s{1,}`"(?<value>(.|`n)*?)(?<!\\)`")?|}" -AllMatches
     [System.Collections.Stack] $stack = @([ordered]@{})
     $level = 0
     $m.matches | % {
