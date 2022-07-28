@@ -5,6 +5,7 @@ Various helper scripts and stuff. Pretty much Windows only.
     - [🖥️ checkdef.cs](#️-checkdefcs)
     - [📦 deploy\_MEGA.bat](#-deploy_megabat)
     - [🖥️ echoo.cs](#️-echoocs)
+    - [🖥️ find\_vs.bat](#️-find_vsbat)
     - [🔑 login\_steam.ps1](#-login_steamps1)
     - [🐒📜 osu!webstuff.user.js](#-osuwebstuffuserjs)
     - [💾 steam\_apps.ps1](#-steam_appsps1)
@@ -36,6 +37,23 @@ Merely echoes all passed arguments and standard input. For debugging/troubleshoo
 Use it by piping program output into it, like so: `dir | echoo`
 
 Compile with a C# 7.0 compiler: `csc echoo.cs -optimize+`
+
+---
+
+### 🖥️ [find_vs.bat](find_vs.bat)
+
+Find Visual Studio Build tools (vcvarsall.bat and so on) via registry.
+
+There are no command line arguments except for an optional index number to pre-emptively select a Visual Studio version, if multiple are installed... (why?)
+
+Example use:
+```
+C:\Users\idiot> call vcvars32
+(not found)
+C:\Users\idiot> call find_vs
+C:\Users\idiot> call vcvars32
+[vcvarsall.bat] Environment initialized for: 'x86'
+```
 
 ---
 
