@@ -9,7 +9,7 @@ goto :start
 
 echo.
 echo Converts a .WebP file to a high-quality .gif
-echo !! requires merlin1337/gifski (Fork), webpinfo and anim_dump (libwebp) in environment PATH
+echo !! requires donMerloni/gifski (Fork), webpinfo and anim_dump (libwebp) in environment PATH
 echo.
 echo usage: %~n0 input.webp
 exit /b 1

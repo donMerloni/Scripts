@@ -70,7 +70,7 @@ call :make_gif "!fileName!" (...) <-- you can change those
 ---
 
 #### 🖼️ [webp2gifski.bat](webp2gifski.bat)
-**requires** [merlin1337/gifski](https://github.com/merlin1337/gifski) (Fork) and [libwebp](https://developers.google.com/speed/webp/download) at runtime.
+**requires** [donMerloni/gifski](https://github.com/donMerloni/gifski) (Fork) and [libwebp](https://developers.google.com/speed/webp/download) at runtime.
 
 Convert WebP to high-quality (and huge!) GIF.
 
