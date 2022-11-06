@@ -7,6 +7,8 @@ Various helper scripts and stuff. Pretty much Windows only.
     - [📂 Coding related](#-coding-related)
       - [🖥️ checkdef.cs](#️-checkdefcs)
       - [🖥️ echoo.cs](#️-echoocs)
+    - [📂 Disk Space Management](#-disk-space-management)
+      - [💾 steam_apps.ps1](#-steam_appsps1)
     - [📂 File Conversion](#-file-conversion)
       - [🖼️ webp2gif.bat](#️-webp2gifbat)
       - [🖼️ webp2gifski.bat](#️-webp2gifskibat)
@@ -35,6 +37,8 @@ Avoid logging out of Steam by clicking "Change User..." because this will make S
 | `login_steam -Gui`         | open poor man's GUI to select stuff                              |
 | `login_steam -Update`      | update script to latest version                                  |
 
+---
+
 ### 📂 Coding related
 
 #### 🖥️ [checkdef.cs](checkdef.cs)
@@ -53,6 +57,17 @@ Merely echoes all passed arguments and standard input. For debugging/troubleshoo
 Use it by piping program output into it, like so: `dir | echoo`
 
 Compile with a C# 7.0 compiler: `csc echoo.cs -optimize+`
+
+---
+
+### 📂 Disk Space Management
+
+#### 💾 [steam_apps.ps1](steam_apps.ps1)
+**made in** PowerShell 5.1.19041.1320
+
+List installed Steam apps and total disk usage.
+
+`-Full` shows a lot more Steam metadata.
 
 ---
 
