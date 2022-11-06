@@ -28,11 +28,9 @@ function DateTo-TimeAgo($date) {
     if ($y -ge 1) {
         $a += N $y 'year'
         $a += N $d 'day'
-    }
-    elseif ($d -ge 1) {
+    } elseif ($d -ge 1) {
         $a += N $d 'day'
-    }
-    else {
+    } else {
         $a += N $h 'hr'
         $a += N $m 'min'
     }
@@ -66,11 +64,9 @@ function Parse-Vdf {
         if ($_ -like '*}') {
             $null = $stack.Pop()
             $level--
-        }
-        elseif ($v.Success) {
+        } elseif ($v.Success) {
             $cur[$k] = $v.Value
-        }
-        else {
+        } else {
             $cur[$k] = [ordered]@{}
             $stack.Push($cur[$k])
             $level++
@@ -82,8 +78,7 @@ function Parse-Vdf {
                 $v = $e[$k]
                 if ($v -is [string]) {
                     write "$(tab $depth)`"$k`"`t`t`"$v`""
-                }
-                else {
+                } else {
                     write "$(tab $depth)`"$k`"`n$(tab $depth){"
                     entry $v ($depth + 1)
                     write "$(tab $depth)}"
@@ -121,8 +116,7 @@ function Login($username) {
 
         if ($Users[$username].Cached) { write "Hello $($Users[$username].PersonaName)" }
         else { write "Please log in for $username" }
-    }
-    else { write 'Please log in' }
+    } else { write 'Please log in' }
 
     if ($process) { $process.Kill() }
     sp registry::HKCU\SOFTWARE\Valve\Steam AutoLoginUser $username
@@ -143,8 +137,7 @@ try {
             if (0 -ne $Host.UI.PromptForChoice('Update', 'It seems like the script was modified. All changes made will be overwritten! Update anyway?', ('&yes', '&no'), 1)) {
                 exit 0
             }
-        }
-        else {
+        } else {
             $tree = (irm 'https://api.github.com/repos/donMerloni/Scripts/git/trees/master' @noCache).tree
             $sha = ($tree | ? path -eq 'login_steam.ps1').sha
 
@@ -236,8 +229,7 @@ try {
         $add { Login '' }
         default { Login $choice.'Account name' }
     }
-}
-catch {
+} catch {
     write "⚠️ Error: $($Error[0]) ($($MyInvocation.MyCommand.Name):$($_.InvocationInfo.ScriptLineNumber))"
     exit 1
 }
