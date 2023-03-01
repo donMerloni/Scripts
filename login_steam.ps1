@@ -52,8 +52,6 @@ function Get-Crc32($bytes) {
 }
 
 function Parse-Vdf {
-    function tab($depth) { if ($depth -gt 0) { [string]::new(9, $depth) } }
-
     $m = $Input | sls "`"(?<key>.+?)`"(?:\s{1,}`"(?<value>(.|`n)*?)(?<!\\)`")?|}" -AllMatches
     [System.Collections.Stack] $stack = @([ordered]@{})
     $level = 0
@@ -73,15 +71,17 @@ function Parse-Vdf {
         }
     }
     $stack.Peek() | add-member ScriptMethod ToString {
+        function tab($depth) { if ($depth -gt 0) { [string]::new(9, $depth) } }
+
         function entry($e, $depth) {
             foreach ($k in $e.keys) {
                 $v = $e[$k]
-                if ($v -is [string]) {
-                    write "$(tab $depth)`"$k`"`t`t`"$v`""
-                } else {
+                if ($v -is [System.Collections.IDictionary]) {
                     write "$(tab $depth)`"$k`"`n$(tab $depth){"
                     entry $v ($depth + 1)
                     write "$(tab $depth)}"
+                } else {
+                    write "$(tab $depth)`"$k`"`t`t`"$v`""
                 }
             }
         }
