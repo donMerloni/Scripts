@@ -10,7 +10,12 @@ param(
     [Parameter()][switch]$Install,
 
     # Update script to latest version
-    [Parameter()][switch]$Update
+    [Parameter()][switch]$Update,
+
+    # Command-line parameters to pass to Steam
+    [Parameter()]
+    [Alias("Cmd")]
+    [string]$SteamParameters
 )
 
 function DateFrom-UnixSeconds ($seconds) { (get-date 1-1-1970).AddSeconds($seconds).ToLocalTime() }
@@ -119,6 +124,10 @@ function Login($username) {
 '@
         [Native]::ShowWindow($process.MainWindowHandle, 1)
 
+        if (![string]::IsNullOrWhiteSpace($SteamParameters)) {
+            & (Join-Path $Steam steam.exe) ($SteamParameters -split ' ')
+        }
+
         return
     } elseif ($Users[$username].Cached) {
         write "Hello $($Users[$username].PersonaName)" 
@@ -130,7 +139,7 @@ function Login($username) {
     sp registry::HKCU\SOFTWARE\Valve\Steam AutoLoginUser $username
     sp registry::HKCU\SOFTWARE\Valve\Steam RememberPassword 1
     
-    & (Join-Path $Steam steam.exe)
+    & (Join-Path $Steam steam.exe) ($SteamParameters -split ' ')
 }
 
 try {

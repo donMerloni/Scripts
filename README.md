@@ -29,13 +29,13 @@ If the script can't find a valid token for a given username, you have to log in 
 To add a new account select the "Add" option in GUI mode or run `login_steam newUsername`.
 Avoid logging out of Steam by clicking "Change User..." because this will make Steam ditch the saved credentials for that account, requiring you to manually log in again in the future.
 
-| usage                      | description                                                      |
-| -------------------------- | ---------------------------------------------------------------- |
-| `login_steam -Install`     | **(recommended)** create a desktop shortcut to start in GUI mode |
-| `login_steam`              | list all users                                                   |
-| `login_steam rushiasimp69` | log in as rushiasimp69                                           |
-| `login_steam -Gui`         | open poor man's GUI to select stuff                              |
-| `login_steam -Update`      | update script to latest version                                  |
+| usage                                                                 | description                                                      |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `login_steam -Install`                                                | **(recommended)** create a desktop shortcut to start in GUI mode |
+| `login_steam`                                                         | list all users                                                   |
+| `login_steam rushiasimp69` <br> `[-SteamParameters '-applaunch 220']` | log in as rushiasimp69 <br> [and launch Half-Life 2]             |
+| `login_steam -Gui`                                                    | open poor man's GUI to select stuff                              |
+| `login_steam -Update`                                                 | update script to latest version                                  |
 
 ---
 
