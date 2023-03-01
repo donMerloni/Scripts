@@ -128,9 +128,9 @@ end {
         $choice = $usersView | Out-GridView -Title 'Log into account' -OutputMode Single
         if (!$choice) { exit 0 }
     
-        switch ($choice.'Account name') {
+        switch ($choice.($view[0].N)) {
             $add { Login '' }
-            default { Login $choice.'Account name' }
+            default { Login $choice.($view[1].N) }
         }
     } catch {
         write "⚠️ Error: $($Error[0]) ($($MyInvocation.MyCommand.Name):$($_.InvocationInfo.ScriptLineNumber))"
