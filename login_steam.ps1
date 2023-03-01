@@ -92,7 +92,6 @@ end {
             $user.Cached = $ConnectCache[(Get-Crc32 $user.AccountName).ToString('x') + '1'].Length -gt 16
             $user.Timestamp /= 1 # Convert to number
             $user.LastLogin = DateTo-TimeAgo (DateFrom-UnixSeconds $user.Timestamp)
-            if ($ActiveUser -eq $_) { $user.Comment = "(logged in) $($user.Comment)" }
             $Users[$user.AccountName] = [PSCustomObject]$user
         }
     
@@ -107,7 +106,11 @@ end {
             @{N = 'Account name'; E = { $_.AccountName } }
             @{N = 'Profile name'; E = { $_.PersonaName } }
             @{N = 'Last login'; E = { $_.LastLogin } }
-            @{N = 'Comment'; E = { $_.Comment } }
+            @{N = 'Comment'; E = {
+                    $loggedIn = if ($_.SteamID64 -eq $ActiveUser) { '(logged in)' }
+                    ($loggedIn, $_.Comment | where { $_ }) -join ' '
+                } 
+            }
         )
         $usersView = $Users.values | sort Timestamp -Descending | select $view
     
