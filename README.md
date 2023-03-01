@@ -3,18 +3,18 @@ Various helper scripts and stuff. Pretty much Windows only.
 
 - [Scripts](#scripts)
     - [📂 Account management](#-account-management)
-      - [🔑 login_steam.ps1](#-login_steamps1)
+      - [🔑 login\_steam.ps1](#-login_steamps1)
     - [📂 Coding related](#-coding-related)
       - [🖥️ checkdef.cs](#️-checkdefcs)
       - [🖥️ echoo.cs](#️-echoocs)
     - [📂 Disk Space Management](#-disk-space-management)
-      - [💾 steam_apps.ps1](#-steam_appsps1)
+      - [💾 steam\_apps.ps1](#-steam_appsps1)
     - [📂 File Conversion](#-file-conversion)
       - [🖼️ webp2gif.bat](#️-webp2gifbat)
       - [🖼️ webp2gifski.bat](#️-webp2gifskibat)
       - [🖼️ webp2mp4.bat](#️-webp2mp4bat)
     - [📂 Packaging/Upload](#-packagingupload)
-      - [📦 deploy_MEGA.bat](#-deploy_megabat)
+      - [📦 deploy\_MEGA.bat](#-deploy_megabat)
 
 ### 📂 Account management
 
@@ -23,11 +23,11 @@ Various helper scripts and stuff. Pretty much Windows only.
 
 Just another Steam account manager.
 
-Quickly log into Steam accounts by prompting Steam to attempt an auto-login for the desired user, which uses Steam's own cached credential tokens on your local PC.
-If the script can't find a valid token for a given username, you have to log in manually with "Remember Password" enabled.
+Quickly log into Steam accounts thanks to user credentials stored on your local PC.
+If there is no valid token, the associated user must log in manually with "Remember Password" enabled.
 
-To add a new account select the "Add" option in GUI mode or run `login_steam newUsername`.
-Avoid logging out of Steam by clicking "Change User..." because this will make Steam ditch the saved credentials for that account, requiring you to manually log in again in the future.
+To add a new account, select "Add" in GUI mode or run `login_steam newUsername`.
+Do not log out of Steam by clicking "Change User…", as this will discard the current user's credentials.
 
 | usage                                                                 | description                                                      |
 | --------------------------------------------------------------------- | ---------------------------------------------------------------- |
