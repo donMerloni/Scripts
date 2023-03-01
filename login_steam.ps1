@@ -138,23 +138,24 @@ try {
     # (Exit 0) Update script to latest version
     #
     if ($Update) {
+        $githubRepo = 'donMerloni/Scripts'
         $noCache = @{Headers = @{'Cache-Control' = 'no-cache' } }
         $localSha = Git-Sha $PSCommandPath
 
-        $blob = try { iwr "https://api.github.com/repos/donMerloni/Scripts/git/blobs/$localSha" @noCache } catch { $_.Exception.Response }
+        $blob = try { iwr "https://api.github.com/repos/$githubRepo/git/blobs/$localSha" @noCache } catch { $_.Exception.Response }
         if ($blob.StatusCode -eq 404) {
             if (0 -ne $Host.UI.PromptForChoice('Update', 'It seems like the script was modified. All changes made will be overwritten! Update anyway?', ('&yes', '&no'), 1)) {
                 exit 0
             }
         } else {
-            $tree = (irm 'https://api.github.com/repos/donMerloni/Scripts/git/trees/master' @noCache).tree
+            $tree = (irm "https://api.github.com/repos/$githubRepo/git/trees/master" @noCache).tree
             $sha = ($tree | ? path -eq 'login_steam.ps1').sha
 
             if ($sha -eq $localSha) { write 'Already up to date'; exit 0 }
         }
 
         write 'Downloading latest version from GitHub'
-        $latest = (iwr 'https://raw.githubusercontent.com/donMerloni/Scripts/master/login_steam.ps1' @noCache).Content
+        $latest = (iwr "https://raw.githubusercontent.com/$githubRepo/master/login_steam.ps1" @noCache).Content
 
         write 'Replacing self'
         [IO.File]::WriteAllText($PSCommandPath, $latest)
