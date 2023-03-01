@@ -104,23 +104,32 @@ function Git-Sha($filepath) {
 }
 
 function Login($username) {
-    $process = (ps Steam -ErrorAction SilentlyContinue)
+    $process = ps Steam -ErrorAction SilentlyContinue
 
-    if ($username) {
-        if ($Users[$username].SteamID64 -eq $ActiveUser -and $process) {
-            write 'Already logged in'
-            Add-Type 'public class Native { [System.Runtime.InteropServices.DllImport("user32.dll")] public static extern void ShowWindow(System.IntPtr hWnd, int nCmdShow); }'
-            [Native]::ShowWindow($process.MainWindowHandle, 1)
-            return
+    if (!$username) {
+        write 'Please log in' 
+    } elseif ($Users[$username].SteamID64 -eq $ActiveUser -and $process) {
+        write 'Already logged in'
+        
+        Add-Type @'
+        public class Native {
+            [System.Runtime.InteropServices.DllImport("user32.dll")]
+            public static extern void ShowWindow(System.IntPtr hWnd, int nCmdShow);
         }
+'@
+        [Native]::ShowWindow($process.MainWindowHandle, 1)
 
-        if ($Users[$username].Cached) { write "Hello $($Users[$username].PersonaName)" }
-        else { write "Please log in for $username" }
-    } else { write 'Please log in' }
+        return
+    } elseif ($Users[$username].Cached) {
+        write "Hello $($Users[$username].PersonaName)" 
+    } else {
+        write "Please log in for $username" 
+    }
 
     if ($process) { $process.Kill() }
     sp registry::HKCU\SOFTWARE\Valve\Steam AutoLoginUser $username
     sp registry::HKCU\SOFTWARE\Valve\Steam RememberPassword 1
+    
     & (Join-Path $Steam steam.exe)
 }
 
