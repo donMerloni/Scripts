@@ -174,25 +174,62 @@ begin {
     }
 
     function Parse-Vdf {
-        $m = $Input | sls "`"(?<key>.+?)`"(?:\s{1,}`"(?<value>(.|`n)*?)(?<!\\)`")?|}" -AllMatches
+        param(
+            [Parameter(ValueFromPipeline)]
+            [string]$Input
+        )
         [System.Collections.Stack] $stack = @([ordered]@{})
-        $level = 0
-        $m.matches | % {
-            $k = $_.groups['key'].value;
-            $v = $_.groups['value']
-            $cur = $stack.Peek()
-            if ($_ -like '*}') {
-                $null = $stack.Pop()
-                $level--
-            } elseif ($v.Success) {
-                $cur[$k] = $v.Value
-            } else {
-                $cur[$k] = [ordered]@{}
-                $stack.Push($cur[$k])
-                $level++
+
+        $cur = $stack.Peek()
+        $key = ''
+        $strIndex = -1
+
+        $totalLen = $Input.Length
+        for ($i = 0; $i -lt $totalLen; $i++) {
+            switch -exact ($Input[$i]) {
+                '"' {
+                    if ($strIndex -eq -1) {
+                        $strIndex = $i + 1
+                    } else {
+                        $len = $i - $strIndex
+                        $str = $Input.Substring($strIndex, $len)
+                        
+                        if ($key -eq '') {
+                            $key = $str
+                        } else {
+                            $cur[$key] = $str
+                            $key = ''
+                        }
+                        
+                        $strIndex = -1
+                    }
+                    break
+                }
+                '{' {
+                    if ($strIndex -eq -1) {
+                        $cur = $cur[$key] = [ordered]@{}
+                        $stack.Push($cur)
+                        $key = ''
+                    }
+                    break
+                }
+                '}' {
+                    if ($strIndex -eq -1) {
+                        $null = $stack.Pop()
+                        $cur = $stack.Peek()
+                    }
+                    break
+                }
+                '\' {
+                    if ($strIndex -ne -1 -and $Input[$i + 1] -eq '"') {
+                        $i++
+                    }
+                    break
+                }
             }
         }
-        $stack.Peek() | add-member ScriptMethod ToString {
+            
+        $cur | add-member ScriptMethod ToString {
             function tab($depth) { if ($depth -gt 0) { [string]::new(9, $depth) } }
 
             function entry($e, $depth) {
