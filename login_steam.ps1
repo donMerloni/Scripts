@@ -186,45 +186,39 @@ begin {
 
         $totalLen = $Input.Length
         for ($i = 0; $i -lt $totalLen; $i++) {
-            switch -exact ($Input[$i]) {
-                '"' {
-                    if ($strIndex -eq -1) {
-                        $strIndex = $i + 1
+            # here lies the switch statement, it was roughly 5 times slower (RIP)
+
+            $ch = $Input[$i]
+            if ($ch -eq '"') {
+                if ($strIndex -eq -1) {
+                    $strIndex = $i + 1
+                } else {
+                    $len = $i - $strIndex
+                    $str = $Input.Substring($strIndex, $len)
+                        
+                    if ($key -eq '') {
+                        $key = $str
                     } else {
-                        $len = $i - $strIndex
-                        $str = $Input.Substring($strIndex, $len)
-                        
-                        if ($key -eq '') {
-                            $key = $str
-                        } else {
-                            $cur[$key] = $str
-                            $key = ''
-                        }
-                        
-                        $strIndex = -1
-                    }
-                    break
-                }
-                '{' {
-                    if ($strIndex -eq -1) {
-                        $cur = $cur[$key] = [ordered]@{}
-                        $stack.Push($cur)
+                        $cur[$key] = $str
                         $key = ''
                     }
-                    break
+                        
+                    $strIndex = -1
                 }
-                '}' {
-                    if ($strIndex -eq -1) {
-                        $null = $stack.Pop()
-                        $cur = $stack.Peek()
-                    }
-                    break
+            } elseif ($ch -eq '{') {
+                if ($strIndex -eq -1) {
+                    $cur = $cur[$key] = [ordered]@{}
+                    $stack.Push($cur)
+                    $key = ''
                 }
-                '\' {
-                    if ($strIndex -ne -1 -and $Input[$i + 1] -eq '"') {
-                        $i++
-                    }
-                    break
+            } elseif ($ch -eq '}') {
+                if ($strIndex -eq -1) {
+                    $null = $stack.Pop()
+                    $cur = $stack.Peek()
+                }
+            } elseif ($ch -eq '\') {
+                if ($strIndex -ne -1 -and $Input[$i + 1] -eq '"') {
+                    $i++
                 }
             }
         }
@@ -297,5 +291,14 @@ begin {
         $stream = [IO.MemoryStream]::new($bytes)
 
         (get-filehash -InputStream $stream -Algorithm SHA1).Hash.ToLower()
+    }
+   
+    function Benchmark ($title, $repeat, $codeBlock) {
+        $totalMs = 0
+        for ($i = 0; $i -lt $repeat; $i++) {
+            Write-Host "$title ($($i+1)/$repeat)`r" -NoNewline
+            $totalMs += (Measure-Command $codeBlock).TotalMilliseconds
+        }
+        Write-Host "`ntook $($totalMs / $repeat)ms on average"
     }
 }
