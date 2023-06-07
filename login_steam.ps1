@@ -12,6 +12,9 @@ param(
     # Update script to latest version
     [Parameter()][switch]$Update,
 
+    # Optionally show SteamID
+    [Parameter()][switch]$ShowSteamID = $false,
+    
     # Command-line parameters to pass to Steam
     [Parameter()]
     [Alias("Cmd")]
@@ -110,6 +113,10 @@ end {
                     $loggedIn = if ($_.SteamID64 -eq $ActiveUser) { '(logged in)' }
                     ($loggedIn, $_.Comment | where { $_ }) -join ' '
                 } 
+            }
+            if ($ShowSteamID) {
+                @{N = 'Steam3ID'; E = { $_.SteamID64 - 0x110000100000000 } }
+                @{N = 'SteamID64'; E = { $_.SteamID64 } }
             }
         )
         $usersView = $Users.values | sort Timestamp -Descending | select $view
