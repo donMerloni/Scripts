@@ -166,7 +166,10 @@ begin {
             write "Please log in for $username" 
         }
 
-        if ($process) { $process.Kill() }
+        if ($process) {
+            $process.Kill()
+            $process.WaitForExit()
+        }
         sp registry::HKCU\SOFTWARE\Valve\Steam AutoLoginUser $username
         sp registry::HKCU\SOFTWARE\Valve\Steam RememberPassword 1
 
