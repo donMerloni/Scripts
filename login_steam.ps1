@@ -105,7 +105,7 @@ end {
     
         # build UI view
         $view = @(
-            @{N = 'Cached'; E = { if ($_.Cached) { return '✓' } } }
+            @{N = 'Cached'; E = { if ($_.Cached) { if (!$Gui) { '✓' } else { '✓                  ' } } } }
             @{N = 'Account name'; E = { $_.AccountName } }
             @{N = 'Profile name'; E = { $_.PersonaName } }
             @{N = 'Last login'; E = { $_.LastLogin } }
