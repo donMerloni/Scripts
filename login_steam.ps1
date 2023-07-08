@@ -237,7 +237,7 @@ begin {
             function tab($depth) { if ($depth -gt 0) { [string]::new(9, $depth) } }
 
             function entry($e, $depth) {
-                foreach ($k in $e.keys) {
+                foreach ($k in $e.PSObject.Properties['Keys'].Value) {
                     $v = $e[$k]
                     if ($v -is [System.Collections.IDictionary]) {
                         write "$(tab $depth)`"$k`"`n$(tab $depth){"
