@@ -190,7 +190,7 @@ begin {
         )
         [System.Collections.Stack] $stack = @([ordered]@{})
 
-        $cur = $stack.Peek()
+        $top = $stack.Peek()
         $key = ''
         $strIndex = -1
 
@@ -209,7 +209,7 @@ begin {
                     if ($key -eq '') {
                         $key = $str
                     } else {
-                        $cur[$key] = $str
+                        $top[$key] = $str
                         $key = ''
                     }
                         
@@ -217,14 +217,14 @@ begin {
                 }
             } elseif ($ch -eq '{') {
                 if ($strIndex -eq -1) {
-                    $cur = $cur[$key] = [ordered]@{}
-                    $stack.Push($cur)
+                    $top = $top[$key] = [ordered]@{}
+                    $stack.Push($top)
                     $key = ''
                 }
             } elseif ($ch -eq '}') {
                 if ($strIndex -eq -1) {
                     $null = $stack.Pop()
-                    $cur = $stack.Peek()
+                    $top = $stack.Peek()
                 }
             } elseif ($ch -eq '\') {
                 if ($strIndex -ne -1 -and $Input[$i + 1] -eq '"') {
@@ -233,15 +233,15 @@ begin {
             }
         }
             
-        $cur | add-member ScriptMethod ToString {
+        $top | add-member ScriptMethod ToString {
             function tab($depth) { if ($depth -gt 0) { [string]::new(9, $depth) } }
 
-            function entry($e, $depth) {
-                foreach ($k in $e.PSObject.Properties['Keys'].Value) {
-                    $v = $e[$k]
+            function writeDict($dict, $depth) {
+                foreach ($k in $dict.PSObject.Properties['Keys'].Value) {
+                    $v = $dict[$k]
                     if ($v -is [System.Collections.IDictionary]) {
                         write "$(tab $depth)`"$k`"`n$(tab $depth){"
-                        entry $v ($depth + 1)
+                        writeDict $v ($depth + 1)
                         write "$(tab $depth)}"
                     } else {
                         write "$(tab $depth)`"$k`"`t`t`"$v`""
@@ -249,7 +249,7 @@ begin {
                 }
             }
 
-            entry $this 0
+            writeDict $this 0
 
         } -Force -PassThru
     }
