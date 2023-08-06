@@ -244,7 +244,7 @@ begin {
                         writeDict $v ($depth + 1)
                         write "$(tab $depth)}"
                     } else {
-                        write "$(tab $depth)`"$k`"`t`t`"$v`""
+                        write "$(tab $depth)`"$k`"`t`"$v`""
                     }
                 }
             }
