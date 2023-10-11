@@ -4,6 +4,8 @@ Various helper scripts and stuff. Pretty much Windows only.
 - [Scripts](#scripts)
     - [📂 Account management](#-account-management)
       - [🔑 login\_steam.ps1](#-login_steamps1)
+    - [📂 Browser scripts](#-browser-scripts)
+      - [🐒📜 osu!webstuff.user.js](#-osuwebstuffuserjs)
     - [📂 Coding related](#-coding-related)
       - [🖥️ checkdef.cs](#️-checkdefcs)
       - [🖥️ echoo.cs](#️-echoocs)
@@ -38,6 +40,15 @@ Do not log out of Steam by clicking "Change User…", as this will discard the c
 | `login_steam -Update`                                                 | update script to latest version                                  |
 
 ---
+
+### 📂 Browser scripts
+
+#### 🐒📜 [osu!webstuff.user.js](osu!webstuff.user.js)
+**requires** [https://www.tampermonkey.net](Tampermonkey browser extension)
+
+An osu! web extension. Right now, this just lets you sort beatmap leaderboards and ranking page tables by clicking on table headers.
+
+Click [https://github.com/donMerloni/Scripts/raw/master/osu!webstuff.user.js](here) to install.
 
 ### 📂 Coding related
 
