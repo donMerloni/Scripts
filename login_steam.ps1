@@ -1,6 +1,6 @@
 ﻿#requires -version 5.1.19041.1320
 param(
-    # Username to login with
+    # Username to log in with
     [Parameter()][string]$Username,
 
     # Start in GUI mode
@@ -22,62 +22,16 @@ param(
 )
 
 end {
-    function DoUpdate {
-        $githubRepo = 'donMerloni/Scripts'
-        $noCache = @{Headers = @{'Cache-Control' = 'no-cache' } }
-        $localSha = Git-Sha $PSCommandPath
-
-        $blob = try { iwr "https://api.github.com/repos/$githubRepo/git/blobs/$localSha" @noCache } catch { $_.Exception.Response }
-        if ($blob.StatusCode -eq 404) {
-            if (0 -ne $Host.UI.PromptForChoice('Update', 'It seems like the script was modified. All changes made will be overwritten! Update anyway?', ('&yes', '&no'), 1)) {
-                exit 0
-            }
-        } else {
-            $tree = (irm "https://api.github.com/repos/$githubRepo/git/trees/master" @noCache).tree
-            $sha = ($tree | ? path -eq 'login_steam.ps1').sha
-
-            if ($sha -eq $localSha) { write 'Already up to date'; exit 0 }
-        }
-
-        write 'Downloading latest version from GitHub'
-        $latest = (iwr "https://raw.githubusercontent.com/$githubRepo/master/login_steam.ps1" @noCache).Content
-
-        write 'Replacing self'
-        [IO.File]::WriteAllText($PSCommandPath, $latest)
-
-        write 'Update successful'
-        exit 0
-    }
-
-    function DoInstall {
-        $shell = new-object -ComObject WScript.Shell
-        $sh = $shell.CreateShortcut((Join-Path $shell.SpecialFolders['Desktop'] 'Steam Account Manager.lnk'))
-
-        if (Test-Path $sh.FullName) {
-            if (0 -ne $Host.UI.PromptForChoice($sh.FullName, 'The shortcut exists already. Overwrite it?', ('&yes', '&no'), 1)) {
-                exit 0
-            }
-        }
-
-        $sh.TargetPath = 'powershell.exe'
-        $sh.WorkingDirectory = $PSScriptRoot
-        $sh.Description = 'Steam Account Manager'
-        $sh.Arguments = "-WindowStyle Hidden -File `"$($PSCommandPath)`" -Gui"
-        $sh.IconLocation = "$(Join-Path $Steam steam.exe),1"
-        $sh.WindowStyle = 7
-        $sh.Save()
-
-        write "Shortcut created: $($sh.FullName)"
-        exit 0
-    }
-
     try {
+        #
+        # (Entry)
+        #
+        $Steam = (gp registry::HKCU\SOFTWARE\Valve\Steam SteamPath).SteamPath
+
         #
         # (Exit 0) Update script to latest version
         #
         if ($Update) { DoUpdate }
-    
-        $Steam = (gp registry::HKCU\SOFTWARE\Valve\Steam SteamPath).SteamPath
     
         #
         # (Exit 1) Create desktop shortcut for GUI mode
@@ -183,6 +137,59 @@ begin {
         & (Join-Path $Steam steam.exe) ($SteamParameters -split ' ')
     }
 
+    function DoUpdate {
+        $githubRepo = 'donMerloni/Scripts'
+        $noCache = @{Headers = @{'Cache-Control' = 'no-cache' } }
+        $localSha = Git-Sha $PSCommandPath
+
+        $blob = try { iwr "https://api.github.com/repos/$githubRepo/git/blobs/$localSha" @noCache } catch { $_.Exception.Response }
+        if ($blob.StatusCode -eq 404) {
+            if (0 -ne $Host.UI.PromptForChoice('Update', 'It seems like the script was modified. All changes made will be overwritten! Update anyway?', ('&yes', '&no'), 1)) {
+                exit 0
+            }
+        } else {
+            $tree = (irm "https://api.github.com/repos/$githubRepo/git/trees/master" @noCache).tree
+            $sha = ($tree | ? path -eq 'login_steam.ps1').sha
+
+            if ($sha -eq $localSha) { write 'Already up to date'; exit 0 }
+        }
+
+        write 'Downloading latest version from GitHub'
+        $latest = (iwr "https://raw.githubusercontent.com/$githubRepo/master/login_steam.ps1" @noCache).Content
+
+        write 'Replacing self'
+        [IO.File]::WriteAllText($PSCommandPath, $latest)
+
+        write 'Update successful'
+        exit 0
+    }
+
+    function DoInstall {
+        $shell = new-object -ComObject WScript.Shell
+        $sh = $shell.CreateShortcut((Join-Path $shell.SpecialFolders['Desktop'] 'Steam Account Manager.lnk'))
+
+        if (Test-Path $sh.FullName) {
+            if (0 -ne $Host.UI.PromptForChoice($sh.FullName, 'The shortcut exists already. Overwrite it?', ('&yes', '&no'), 1)) {
+                exit 0
+            }
+        }
+
+        $sh.TargetPath = 'powershell.exe'
+        $sh.WorkingDirectory = $PSScriptRoot
+        $sh.Description = 'Steam Account Manager'
+        $sh.Arguments = "-WindowStyle Hidden -File `"$($PSCommandPath)`" -Gui"
+        $sh.IconLocation = "$(Join-Path $Steam steam.exe),1"
+        $sh.WindowStyle = 7
+        $sh.Save()
+
+        write "Shortcut created: $($sh.FullName)"
+        exit 0
+    }
+
+    #
+    # Utility stuff
+    # 
+
     function Parse-Vdf {
         param(
             [Parameter(ValueFromPipeline)]
@@ -278,7 +285,7 @@ begin {
     }
 
     function Get-Crc32($bytes) {
-        if ($bytes -is [string]) { $bytes = [System.Text.Encoding]::UTF8.GetBytes($bytes) }
+        if ($bytes -is [string]) { $bytes = [Text.Encoding]::UTF8.GetBytes($bytes) }
 
         $crc = [uint32]'0xFFFFFFFF' # Microsoft strikes again
         foreach ($b in $bytes) {
@@ -301,14 +308,5 @@ begin {
         $stream = [IO.MemoryStream]::new($bytes)
 
         (get-filehash -InputStream $stream -Algorithm SHA1).Hash.ToLower()
-    }
-   
-    function Benchmark ($title, $repeat, $codeBlock) {
-        $totalMs = 0
-        for ($i = 0; $i -lt $repeat; $i++) {
-            Write-Host "$title ($($i+1)/$repeat)`r" -NoNewline
-            $totalMs += (Measure-Command $codeBlock).TotalMilliseconds
-        }
-        Write-Host "`ntook $($totalMs / $repeat)ms on average"
     }
 }
