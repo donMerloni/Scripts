@@ -195,70 +195,148 @@ begin {
             [Parameter(ValueFromPipeline)]
             [string]$Input
         )
-        [System.Collections.Stack] $stack = @([ordered]@{})
+        [Collections.Stack] $stack = @([ordered]@{})
 
         $top = $stack.Peek()
-        $key = ''
-        $strIndex = -1
+        $key = [string]::Empty
+        $comment = [string]::Empty
+        $tokenIndex = -1
+        $tokenQuoted = $false
 
         $totalLen = $Input.Length
         for ($i = 0; $i -lt $totalLen; $i++) {
             # here lies the switch statement, it was roughly 5 times slower (RIP)
 
             $ch = $Input[$i]
-            if ($ch -eq '"') {
-                if ($strIndex -eq -1) {
-                    $strIndex = $i + 1
+
+            if ($tokenIndex -ne -1) {
+                # currently in a key/value token
+
+                if ($tokenQuoted) {
+                    $endOfToken = $ch -eq '"' -and $Input[$i - 1] -ne '\'
                 } else {
-                    $len = $i - $strIndex
-                    $str = $Input.Substring($strIndex, $len)
-                        
-                    if ($key -eq '') {
-                        $key = $str
-                    } else {
-                        $top[$key] = $str
-                        $key = ''
-                    }
-                        
-                    $strIndex = -1
+                    $endOfToken = $ch -eq '"' -or $ch -eq '{' -or $ch -eq '}' -or [char]::IsWhiteSpace($ch)
                 }
+
+                if ($endOfToken) {
+                    $token = $Input.Substring($tokenIndex, $i - $tokenIndex)
+                    if ($key -eq [string]::Empty) { 
+                        # KEY = ?
+                        $key = $token
+                    } else {
+                        # KEY = "VALUE"
+                        $top[$key] = $token
+                        $top.Comments[$key] = $comment
+                        $comment = [string]::Empty
+                        $key = [string]::Empty
+                    }
+                    $tokenIndex = -1
+
+                    # to make my life easier
+                    if (!$tokenQuoted) { $i-- }
+                } 
+            } elseif ([char]::IsWhiteSpace($ch)) {
+                continue 
+            } elseif ($ch -eq '"') {
+                # quoted token begin
+                $tokenIndex = $i + 1
+                $tokenQuoted = $true
             } elseif ($ch -eq '{') {
-                if ($strIndex -eq -1) {
-                    $top = $top[$key] = [ordered]@{}
-                    $stack.Push($top)
-                    $key = ''
-                }
-            } elseif ($ch -eq '}') {
-                if ($strIndex -eq -1) {
-                    $null = $stack.Pop()
-                    $top = $stack.Peek()
-                }
-            } elseif ($ch -eq '\') {
-                if ($strIndex -ne -1 -and $Input[$i + 1] -eq '"') {
-                    $i++
-                }
-            }
-        }
-            
-        $top | add-member ScriptMethod ToString {
-            function tab($depth) { if ($depth -gt 0) { [string]::new(9, $depth) } }
-
-            function writeDict($dict, $depth) {
-                foreach ($k in $dict.PSObject.Properties['Keys'].Value) {
-                    $v = $dict[$k]
-                    if ($v -is [System.Collections.IDictionary]) {
-                        write "$(tab $depth)`"$k`"`n$(tab $depth){"
-                        writeDict $v ($depth + 1)
-                        write "$(tab $depth)}"
+                # KEY = @{ ... }
+                
+                $child = [ordered]@{}
+                if ($top.Contains($key)) {
+                    if ($top[$key] -is [array]) {
+                        $top[$key] += $child
                     } else {
-                        write "$(tab $depth)`"$k`"`t`"$v`""
+                        $top[$key] = $top[$key], $child
                     }
+                } else {
+                    $top[$key] = $child
                 }
-            }
+                $key = [string]::Empty
+                
+                $child.PSObject.Members.Add([PSNoteProperty]::new('Comment', $comment), $true)
+                $child.PSObject.Members.Add([PSNoteProperty]::new('Comments', [ordered]@{}), $true)
+                $child.PSObject.Methods.Add([PSScriptMethod]::new('Get', { param($key, $index = 0)
+                            $v = $this[$key]
+                            if ($v -isnot [array] ) { return $v }
+                            $v[$index]
+                        }), $true)
+                $comment = [string]::Empty
+                
+                $top = $child
+                $stack.Push($top)
+            } elseif ($ch -eq '}') {
+                # back to parent
 
-            writeDict $this 0
+                $null = $stack.Pop()
+                $top = $stack.Peek()
+            } elseif ($ch -eq '/') {
+                if ($Input[$i + 1] -eq '/') {
+                    # singleline comment
+                    for ($c = $i + 2; $Input[$i] -ne "`n"; $i++) {}
+                    $newComment = $Input.Substring($c, $i - $c - ($Input[$i - 1] -eq "`r"))
+                } elseif ($Input[$i + 1] -eq '*') {
+                    # multiline comment
+                    for ($c = $i + 2; $Input[$i] -ne '/' -or $Input[$i - 1] -ne '*'; $i++) {}
+                    $newComment = $Input.Substring($c, $i - $c - 1 )
+                }
 
-        } -Force -PassThru
+                if ($newComment) {
+                    if ($comment) {
+                        # we abuse \v to allow splitting a comment into separate comments
+                        $comment = "$comment`v`v$newComment"
+                    } else {
+                        $comment = $newComment
+                    }
+                    $newComment = [string]::Empty
+                }
+            } else {
+                # non-quoted token begin
+                $tokenIndex = $i
+                $tokenQuoted = $false
+            } 
+        }
+
+        $top.PSObject.Methods.Add([PSScriptMethod]::new('ToString', {
+                    function writeDict($dict, $depth) {
+                        foreach ($k in $dict.PSObject.Properties['Keys'].Value) {
+                            $dict[$k] | % {
+                                $v = $_
+                                $t = [string]::new(9, $depth)
+                                $isDict = $v -is [Collections.IDictionary]
+
+                                if ($isDict) { $c = $v.Comment } else { $c = $dict.Comments[$k] }
+                                if ($c) {
+                                    # split comment into separate comments
+                                    $c -split "`v" | % {
+                                        if ($_) {
+                                            # write comment
+                                            write "$t/*$_*/"
+                                        } else {
+                                            write ""
+                                        }
+                                    }
+                                }
+
+                                if ($isDict) {
+                                    # write subdict
+                                    write "$t""$k"""
+                                    write "$t{"
+                                    writeDict $v ($depth + 1)
+                                    write "$t}"
+                                } else {
+                                    # write key/value pair
+                                    write "$t""$k""`t""$v"""
+                                }
+                            }
+                        }
+                    }
+    
+                    writeDict $this 0
+                }), $true)
+        $top
     }
 
     function DateFrom-UnixSeconds ($seconds) { (get-date 1-1-1970).AddSeconds($seconds).ToLocalTime() }
