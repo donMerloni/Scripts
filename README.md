@@ -44,11 +44,11 @@ Do not log out of Steam by clicking "Change User…", as this will discard the c
 ### 📂 Browser scripts
 
 #### 🐒📜 [osu!webstuff.user.js](osu!webstuff.user.js)
-**requires** [https://www.tampermonkey.net](Tampermonkey browser extension)
+**requires** [Tampermonkey browser extension](https://www.tampermonkey.net)
 
 An osu! web extension. Right now, this just lets you sort beatmap leaderboards and ranking page tables by clicking on table headers.
 
-Click [https://github.com/donMerloni/Scripts/raw/master/osu!webstuff.user.js](here) to install.
+Click [here](https://github.com/donMerloni/Scripts/raw/master/osu!webstuff.user.js) to install.
 
 ### 📂 Coding related
 
