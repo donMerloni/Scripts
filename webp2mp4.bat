@@ -1,4 +1,6 @@
 @echo off
+setlocal
+call :parse_args %*
 call :check_dependencies "F:%~1" P:ffmpeg P:webpinfo P:anim_dump || goto :help
 goto :start
 
@@ -11,8 +13,24 @@ echo.
 echo Converts a .WebP file to .mp4
 echo !! requires ffmpeg, webpinfo and anim_dump (libwebp) in environment PATH
 echo.
-echo usage: %~n0 input.webp
+echo usage: %~n0 input.webp [ "VideoFilter=..." ]
 exit /b 1
+
+::
+:: Simple command line arguments, e.g. MyScript.bat "variable1=value1" "variable2=value2"
+::
+:parse_args
+
+set i=0
+:parse_args_loop
+    set /a i+=1
+    call set "arg=%%%i%%"
+    if [%arg%]==[] exit /b
+
+    for /F %%A in ('echo %arg%') do set "arg=%%~A"
+    echo %arg% | findstr /R "^[a-z0-9][a-z]*=..*$" >nul && set %arg%
+    goto :parse_args_loop
+exit /b
 
 ::
 :: Determine whether all specified input files (F:XXX), input directories (D:XXX), input values (V:XXX) and external programs (P:XXX) are present. Returns 1, if any are missing.
@@ -56,20 +74,33 @@ pushd !tempDir!
     :: extract .PNG frames
     anim_dump -prefix "!prefix!" "!filePath!"
 
+    set frameCount=0
+    for /F %%P in ('dir /b "!prefix!*.png"') do (
+        set /a frameCount+=1
+        rename "%%~P" "!prefix!!frameCount!%%~xP"
+    )
+
     echo Extracting frame durations to !tempDir!\!prefix!concat.txt
     set frameNumber=0
     for /F "tokens=1,2" %%A in ('webpinfo -summary "!filePath!"') do (
         if "%%~A"=="Duration:" (
-            call :pad_left !frameNumber! 4 0 name
-            echo file '!prefix!!name!.png' >>"!prefix!concat.txt"
+            set /a frameNumber+=1
+            echo file '!prefix!!frameNumber!.png' >>"!prefix!concat.txt"
             call :pad_left %%B 4 0 duration
             set duration=!duration:~0,-3!.!duration:~-3!
             echo duration !duration! >>"!prefix!concat.txt"
-            set /a frameNumber+=1
         )
     )
 
-    ffmpeg -f concat -i "!prefix!concat.txt" -pix_fmt yuv420p "!fileName!.mp4"
+    if not "%VideoFilter%"=="" (
+        ffmpeg -i "!prefix!%%d.png" -vf "%VideoFilter%" "!prefix!%%d.png"
+    )
+
+    if not exist "!prefix!concat.txt" (
+        ffmpeg -loop 1 -i "!prefix!1.png" -t 10 -pix_fmt yuv420p "!fileName!.mp4"
+    ) else (
+        ffmpeg -f concat -i "!prefix!concat.txt" -pix_fmt yuv420p "!fileName!.mp4"
+    )
     del "!prefix!*"
 popd
 move "!tempDir!\!fileName!.mp4" .

@@ -1,4 +1,6 @@
 @echo off
+setlocal
+call :parse_args %*
 call :check_dependencies "F:%~1" P:gifski P:webpinfo P:anim_dump || goto :help
 goto :start
 
@@ -11,8 +13,24 @@ echo.
 echo Converts a .WebP file to a high-quality .gif
 echo !! requires donMerloni/gifski (Fork), webpinfo and anim_dump (libwebp) in environment PATH
 echo.
-echo usage: %~n0 input.webp
+echo usage: %~n0 input.webp [ "VideoFilter=..." ]
 exit /b 1
+
+::
+:: Simple command line arguments, e.g. MyScript.bat "variable1=value1" "variable2=value2"
+::
+:parse_args
+
+set i=0
+:parse_args_loop
+    set /a i+=1
+    call set "arg=%%%i%%"
+    if [%arg%]==[] exit /b
+
+    for /F %%A in ('echo %arg%') do set "arg=%%~A"
+    echo %arg% | findstr /R "^[a-z0-9][a-z]*=..*$" >nul && set %arg%
+    goto :parse_args_loop
+exit /b
 
 ::
 :: Determine whether all specified input files (F:XXX), input directories (D:XXX), input values (V:XXX) and external programs (P:XXX) are present. Returns 1, if any are missing.
@@ -59,6 +77,10 @@ pushd !tempDir!
     echo Extracting frame durations to !tempDir!\!prefix!frames.txt
     for /F "tokens=1,2" %%A in ('webpinfo -summary "!filePath!"') do (
         if "%%~A"=="Duration:" echo.%%~B >>"!prefix!frames.txt"
+    )
+
+    if not "%VideoFilter%"=="" (
+        ffmpeg -i "!prefix!%%d.png" -vf "%VideoFilter%" "!prefix!%%d.png"
     )
 
     if not exist "!prefix!frames.txt" (
