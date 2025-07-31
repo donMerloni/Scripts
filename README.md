@@ -12,6 +12,7 @@ Various helper scripts and stuff. Pretty much Windows only.
     - [🖼️ webp2gif.bat](#️-webp2gifbat)
     - [🖼️ webp2gifski.bat](#️-webp2gifskibat)
     - [🖼️ webp2mp4.bat](#️-webp2mp4bat)
+    - [🚊 wien-fahrplan.py](#-wien-fahrplanpy)
 
 
 ### 🖥️ [checkdef.cs](checkdef.cs)
@@ -102,3 +103,11 @@ Convert WebP to high-quality (and huge!) GIF.
 **requires** [ffmpeg](https://www.ffmpeg.org/) and [libwebp](https://developers.google.com/speed/webp/download) at runtime.
 
 Convert WebP to MP4. Compact and good quality... but apparently not suited for having looping video in WPF, which is why I wrote 3 different webp scripts...
+
+---
+
+### 🚊 [wien-fahrplan.py](wien-fahrplan.py)
+
+**requires** [Python 3](https://www.python.org/downloads/) and pip packages [beautifulsoup4](https://pypi.org/project/beautifulsoup4/), [pathvalidate](https://pypi.org/project/pathvalidate/), [requests](https://pypi.org/project/requests/)
+
+Downloads Wiener Linien timetable PDFs to `%cd%\wien\fahrplan\...`
