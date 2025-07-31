@@ -8,6 +8,7 @@ Various helper scripts and stuff. Pretty much Windows only.
     - [🖥️ find\_vs.bat](#️-find_vsbat)
     - [🔑 login\_steam.ps1](#-login_steamps1)
     - [🐒📜 osu!webstuff.user.js](#-osuwebstuffuserjs)
+    - [🐒🖼️⬇️ pixiv.user.js](#️️-pixivuserjs)
     - [🖥️ shellcode.ps1](#️-shellcodeps1)
     - [💾 steam\_apps.ps1](#-steam_appsps1)
     - [🖼️ webp2gif.bat](#️-webp2gifbat)
@@ -75,6 +76,15 @@ Do not log out of Steam by clicking "Change User…", as this will discard the c
 An osu! web extension. Right now, this just lets you sort beatmap leaderboards and ranking page tables by clicking on table headers.
 
 Click [here](https://github.com/donMerloni/Scripts/raw/master/osu!webstuff.user.js) to install.
+
+---
+
+### 🐒🖼️⬇️ [pixiv.user.js](pixiv.user.js)
+**requires** [Tampermonkey browser extension](https://www.tampermonkey.net)
+
+A pixiv extension. Lets you download albums as zip and animations as mp4.
+
+Click [here](https://github.com/donMerloni/Scripts/raw/master/pixiv.user.js) to install.
 
 ---
 
