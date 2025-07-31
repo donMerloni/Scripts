@@ -29,10 +29,18 @@ class App
         {
             var Input = (fg: ConsoleColor.Blue, bg: ConsoleColor.Black);
             var Special = (fg: ConsoleColor.Red, bg: Input.bg);
-            var LineStart = (on: false, c: "|", fg: (ConsoleColor?)null, bg: ConsoleColor.DarkGreen);
+            var LineStart = (on: true, c: "|", fg: ConsoleColor.DarkGray, bg: (ConsoleColor?)null, count: 0);
+
+            void _lineStart()
+            {
+                if (!LineStart.on) return;
+                LineStart.count++;
+                var ln = LineStart.count.ToString();
+                Output(new string('\b', ln.Length) + ln + LineStart.c, LineStart.fg, LineStart.bg);
+            }
 
             Output("\nInput:\t", ConsoleColor.Green);
-            if (LineStart.on) Output(LineStart.c, LineStart.fg, LineStart.bg);
+            _lineStart();
             while (Console.In.Peek() != -1)
             {
                 var c = (char)Console.In.Read();
@@ -49,7 +57,7 @@ class App
                     case '\n':
                         Output("\\n\n", Special.fg, Special.bg);
                         Output("\t");
-                        if (LineStart.on) Output(LineStart.c, LineStart.fg, LineStart.bg);
+                        _lineStart();
                         break;
 
                     case ' ':
@@ -68,14 +76,16 @@ class App
 
     static bool HasInput() => Console.IsInputRedirected && Console.In.Peek() != -1;
 
+    static ConsoleColor InitFg = Console.ForegroundColor;
+    static ConsoleColor InitBg = Console.BackgroundColor;
+    static ConsoleColor Fg = Console.ForegroundColor;
+    static ConsoleColor Bg = Console.BackgroundColor;
     static void Output(string text, ConsoleColor? fg = null, ConsoleColor? bg = null)
     {
-        var oldFg = Console.ForegroundColor;
-        var oldBg = Console.BackgroundColor;
-        if (fg != null) Console.ForegroundColor = fg.Value;
-        if (bg != null) Console.BackgroundColor = bg.Value;
+        fg = fg ?? InitFg;
+        bg = bg ?? InitBg;
+        if (fg != Fg) Console.ForegroundColor = Fg = fg.Value;
+        if (bg != Bg) Console.BackgroundColor = Bg = bg.Value;
         Console.Write(text);
-        Console.ForegroundColor = oldFg;
-        Console.BackgroundColor = oldBg;
     }
 }
