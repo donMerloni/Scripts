@@ -27,13 +27,6 @@ Compile with a C# 7.0 compiler: `csc echoo.cs -optimize+`
 
 Zip a directory, upload it to MEGA and then move it locally.
 
-| usage                                           | description                                                      |
-| ----------------------------------------------- | ---------------------------------------------------------------- |
-| `deploy_MEGA {dir} {name} {megaDir} {localDir}` | zip {dir} to {name}.zip, upload to {megaDir}, move to {localDir} |
-```bat
-deploy_MEGA "C:\MyProject\bin\Release" MyProject-Release "/Uploaded Packages" "D:\Local Packages"
-```
-
 ---
 
 ### 🖥️ [echoo.cs](echoo.cs)
@@ -49,21 +42,10 @@ Compile with a C# 7.0 compiler: `csc echoo.cs -optimize+`
 ### 🔑 [login_steam.ps1](login_steam.ps1)
 **made in** PowerShell 5.1.19041.1320
 
-Just another Steam account manager.
+Log into your Steam accounts with user credentials stored on your local PC.
+Check "Remember Password" during Steam Login to generate these credentials.
 
-Quickly log into Steam accounts thanks to user credentials stored on your local PC.
-If there is no valid token, the associated user must log in manually with "Remember Password" enabled.
-
-To add a new account, select "Add" in GUI mode or run `login_steam newUsername`.
 Do not log out of Steam by clicking "Change User…", as this will discard the current user's credentials.
-
-| usage                                                                 | description                                                      |
-| --------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `login_steam -Install`                                                | **(recommended)** create a desktop shortcut to start in GUI mode |
-| `login_steam`                                                         | list all users                                                   |
-| `login_steam rushiasimp69` <br> `[-SteamParameters '-applaunch 220']` | log in as rushiasimp69 <br> [and launch Half-Life 2]             |
-| `login_steam -Gui`                                                    | open poor man's GUI to select stuff                              |
-| `login_steam -Update`                                                 | update script to latest version                                  |
 
 ---
 
@@ -81,18 +63,13 @@ Click [here](https://github.com/donMerloni/Scripts/raw/master/osu!webstuff.user.
 
 List installed Steam apps and total disk usage.
 
-`-Full` shows a lot more Steam metadata.
-
 ---
 
 ### 🖼️ [webp2gif.bat](webp2gif.bat)
 **requires** [ffmpeg](https://www.ffmpeg.org/) and [libwebp](https://developers.google.com/speed/webp/download) at runtime.
 
 Convert WebP to GIF with ffmpeg.
-[Relevant FFmpeg settings](http://ffmpeg.org/ffmpeg-filters.html#palettegen-1) can be changed [in the code](https://github.com/lakatosm/Scripts/blob/00379cfaa01be333a91acfb84b6a09320824b4ff/webp2gif.bat#L37):
-```bat
-call :make_gif "!fileName!" (...) <-- you can change those
-```
+[Relevant FFmpeg settings](http://ffmpeg.org/ffmpeg-filters.html#palettegen-1) can be changed [in the code](https://github.com/lakatosm/Scripts/blob/00379cfaa01be333a91acfb84b6a09320824b4ff/webp2gif.bat#L37).
 
 ---
 

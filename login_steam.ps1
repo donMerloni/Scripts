@@ -1,4 +1,16 @@
-﻿#requires -version 5.1.19041.1320
+﻿<#
+    .DESCRIPTION
+    Log into your Steam accounts.
+
+    usage:
+        login_steam -Install                               (recommended) create a desktop shortcut to start in GUI mode
+        login_steam                                        list all users
+        login_steam rushialover69 -Cmd '-applaunch 220'    log in as rushialover69 and launch Half-Life 2
+        login_steam -Gui                                   open poor man's GUI to select stuff
+        login_steam -Update                                update script to latest version
+#>
+
+#requires -version 5.1.19041.1320
 param(
     # Username to log in with
     [Parameter()][string]$Username,
