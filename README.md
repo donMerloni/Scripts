@@ -8,6 +8,7 @@ Various helper scripts and stuff. Pretty much Windows only.
     - [🖥️ find\_vs.bat](#️-find_vsbat)
     - [🔑 login\_steam.ps1](#-login_steamps1)
     - [🐒📜 osu!webstuff.user.js](#-osuwebstuffuserjs)
+    - [🖥️ shellcode.ps1](#️-shellcodeps1)
     - [💾 steam\_apps.ps1](#-steam_appsps1)
     - [🖼️ webp2gif.bat](#️-webp2gifbat)
     - [🖼️ webp2gifski.bat](#️-webp2gifskibat)
@@ -74,6 +75,14 @@ Do not log out of Steam by clicking "Change User…", as this will discard the c
 An osu! web extension. Right now, this just lets you sort beatmap leaderboards and ranking page tables by clicking on table headers.
 
 Click [here](https://github.com/donMerloni/Scripts/raw/master/osu!webstuff.user.js) to install.
+
+---
+
+### 🖥️ [shellcode.ps1](shellcode.ps1)
+**made in** PowerShell 5.1.19041.6093\
+**requires** [Netwide Assembler (nasm.exe)](https://github.com/netwide-assembler/nasm) at runtime.
+
+Small wrapper script around nasm to generate nicely formatted and commented shellcode as a C-string literal.
 
 ---
 
