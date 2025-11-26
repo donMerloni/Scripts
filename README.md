@@ -3,6 +3,7 @@ Various helper scripts and stuff. Pretty much Windows only.
 
 - [Scripts](#scripts)
     - [🖥️ checkdef.cs](#️-checkdefcs)
+    - [🐒📜 civitai.user.js](#-civitaiuserjs)
     - [📦 deploy\_MEGA.bat](#-deploy_megabat)
     - [🖥️ echoo.cs](#️-echoocs)
     - [🖥️ find\_vs.bat](#️-find_vsbat)
@@ -23,6 +24,15 @@ Various helper scripts and stuff. Pretty much Windows only.
 Lookup the value of preprocessor defines. Can't execute macros (for now..?).
 
 Compile with a C# 7.0 compiler: `csc echoo.cs -optimize+`
+
+---
+
+### 🐒📜 [civitai.user.js](civitai.user.js)
+**requires** [Tampermonkey browser extension](https://www.tampermonkey.net)
+
+A Civitai extension. Shows daily Buzz status at the top and adds a Shift+B hotkey to jump to the "Buzz Beggars Board".
+
+Click [here](https://github.com/donMerloni/Scripts/raw/master/civitai.user.js) to install.
 
 ---
 
