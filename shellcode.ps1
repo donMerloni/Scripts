@@ -71,11 +71,12 @@ if ($Test) {
 
 # pass1: split lines into fields and find comment indentation start
 $Lines = $Lines | ForEach-Object {
-    if ($_ -match "^(?:\s*(?'Ln'\d+))(?:\s(?'Addr'[0-9A-F]+))?(?:\s(?'Bytes'[0-9A-F]+))?(?'Wrap'-)?(?:\s?<rep (?'Rep'[0-9A-F]+h?)>)?(?'Ws'\s*)(?'Comment'.*)") {
+    if ($_ -match "^(?:\s*(?'Ln'\d+))(?:\s(?'Addr'[0-9A-F]+))?(?:\s(?'Bytes'[0-9A-F()]+))?(?'Wrap'-)?(?:\s?<rep (?'Rep'[0-9A-F]+h?)>)?(?'Ws'\s*)(?'Comment'.*)") {
         $m = $matches
         $comment = $m['comment']
+        $m['Bytes'] = $m['Bytes'] -replace '[()]', [string]::Empty
         $m['CommentIndex'] = if ($comment) { $_.Length - $comment.Length } else { [int]::MaxValue }
-        $m['IsData'] = $comment -match '^(.+?:)?(\s*times\s+\w+)?(?:\s+((d[bwdqtoyz])|res[bwdqtoyz]))'
+        $m['IsData'] = $comment -match '^(.+?:)?(\s*times\s+\w+\s+)?(?:\s*((d[bwdqtoyz])|res[bwdqtoyz]))'
         $m['Original'] = $_
         [PSCustomObject]$m
     }
@@ -105,6 +106,7 @@ $Lines = $Lines | ForEach-Object { $prev = $null; $instructionSize = 0 } {
         $_.Bytes = $prev.Bytes + $_.Bytes
         $_.Rep = [Math]::Max($_.Rep, $prev.Rep)
         $_.Comment = $prev.Comment
+        $_.IsData = $prev.IsData
         $prev = $null
     }
     if ($_.Wrap) {
