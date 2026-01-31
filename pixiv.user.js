@@ -272,6 +272,12 @@
                         "concat",
                         "-i",
                         "concat.txt",
+
+                        "-tune",
+                        "zerolatency",
+                        "-preset",
+                        "fast",
+
                         "-vf",
                         "scale=trunc(iw/2)*2:trunc(ih/2)*2",
                         "-pix_fmt",
@@ -317,18 +323,38 @@
                 setProgress({ color: "white" });
 
                 // use Tampermonkey's request function to bypass CORS trash
-                const image = await GM.xmlHttpRequest({
-                    method: "GET",
-                    url,
-                    responseType: "arraybuffer",
-                    headers: { referer: window.location.origin },
-                    onload: () =>
-                        console.log(`downloaded ${count}/${pageCount}`),
-                    onprogress: (e) =>
-                        pages.body.length == 1 &&
-                        setProgress(e.total != -1 ? e.loaded / e.total : 0.5),
-                }).then((res) => res.response);
+                const getImage = async () =>
+                    await GM.xmlHttpRequest({
+                        method: "GET",
+                        url,
+                        responseType: "arraybuffer",
+                        headers: { referer: window.location.origin },
+                        onload: () =>
+                            console.log(
+                                `downloaded ${count}/${pageCount} after ${retry} attempt(s)`
+                            ),
+                        onprogress: (e) =>
+                            pages.body.length == 1 &&
+                            setProgress(
+                                e.total != -1 ? e.loaded / e.total : 0.5
+                            ),
+                    }).then((res) => res.response);
 
+                let image;
+                let retry = 1;
+                for (; ; retry++) {
+                    try {
+                        image = await getImage();
+                    } catch (error) {
+                        console.trace(error);
+                        await new Promise((r) =>
+                            setTimeout(r, 500 * 2 ** retry)
+                        );
+                        continue;
+                    }
+
+                    break;
+                }
                 setProgress(count / pageCount, { color: "#6feb6f" });
 
                 Files[String(count).padStart(digits, "0") + ".jpg"] =
