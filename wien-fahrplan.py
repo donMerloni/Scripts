@@ -52,7 +52,7 @@ class Item:
         self.line = " ".join(parts[:2]).removeprefix("Linie ")
         self.line_extra = "".join(parts[2:])
         self.version = datetime.strptime(
-            re.search("(\d+\.\d+.\d+)", self.raw.version).groups()[0], "%d.%m.%Y"
+            re.search(r"(\d+\.\d+.\d+)", self.raw.version).groups()[0], "%d.%m.%Y"
         )
 
         valid_period = self.raw.date and f" [{self.raw.date}]" or ""
